@@ -1,0 +1,23 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.container {
+  max-width: 400px;
+  background-color: #eeeeee;
+  border: 1px solid black;
+}
+
+.header {
+  text-align: center;
+}
