@@ -1,6 +1,6 @@
 *.swp
 *~
-.DSStore
+.DS_Store
 blog.md
 node_modules/
 npm-debug.log
