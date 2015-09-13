@@ -1,3 +1,5 @@
+*~
+*.swp
 node_modules/
 npm-debug.log
 blog.md
