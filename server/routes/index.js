@@ -19,6 +19,12 @@ router.post('/api/v1/todos', function(req, res) {
 
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({ success: false, data: err});
+        }
 
         // SQL Query > Insert Data
         client.query("INSERT INTO items(text, complete) values($1, $2)", [data.text, data.complete]);
@@ -33,14 +39,10 @@ router.post('/api/v1/todos', function(req, res) {
 
         // After all data is returned, close connection and return results
         query.on('end', function() {
-            client.end();
+            done();
             return res.json(results);
         });
 
-        // Handle Errors
-        if(err) {
-          console.log(err);
-        }
 
     });
 });
@@ -51,6 +53,12 @@ router.get('/api/v1/todos', function(req, res) {
 
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({ success: false, data: err});
+        }
 
         // SQL Query > Select Data
         var query = client.query("SELECT * FROM items ORDER BY id ASC;");
@@ -62,14 +70,9 @@ router.get('/api/v1/todos', function(req, res) {
 
         // After all data is returned, close connection and return results
         query.on('end', function() {
-            client.end();
+            done();
             return res.json(results);
         });
-
-        // Handle Errors
-        if(err) {
-          console.log(err);
-        }
 
     });
 
@@ -87,6 +90,12 @@ router.put('/api/v1/todos/:todo_id', function(req, res) {
 
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).send(json({ success: false, data: err}));
+        }
 
         // SQL Query > Update Data
         client.query("UPDATE items SET text=($1), complete=($2) WHERE id=($3)", [data.text, data.complete, id]);
@@ -101,15 +110,9 @@ router.put('/api/v1/todos/:todo_id', function(req, res) {
 
         // After all data is returned, close connection and return results
         query.on('end', function() {
-            client.end();
+            done();
             return res.json(results);
         });
-
-        // Handle Errors
-        if(err) {
-          console.log(err);
-        }
-
     });
 
 });
@@ -124,6 +127,12 @@ router.delete('/api/v1/todos/:todo_id', function(req, res) {
 
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+          done();
+          console.log(err);
+          return res.status(500).json({ success: false, data: err});
+        }
 
         // SQL Query > Delete Data
         client.query("DELETE FROM items WHERE id=($1)", [id]);
@@ -138,15 +147,9 @@ router.delete('/api/v1/todos/:todo_id', function(req, res) {
 
         // After all data is returned, close connection and return results
         query.on('end', function() {
-            client.end();
+            done();
             return res.json(results);
         });
-
-        // Handle Errors
-        if(err) {
-          console.log(err);
-        }
-
     });
 
 });
