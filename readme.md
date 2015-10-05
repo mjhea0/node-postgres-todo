@@ -14,17 +14,17 @@ This is a basic single page application built with Node, Express, Angular, and P
 
 ## Tests
 
-This comes with a load test using 
-(Apache Bench)[http://httpd.apache.org/docs/2.2/programs/ab.html]
-that by default exercises the API endpoint for the `/api/v1/todos` service: 
+This comes with a load test using (Apache Bench)[http://httpd.apache.org/docs/2.2/programs/ab.html] that by default exercises the API endpoint for the `/api/v1/todos` service:
 
-    tests/load-test.sh
+```
+tests/load-test.sh
+```
 
 Using this load test it is possible to verify several things:
 
-* that the database is using as many connections as expected (it polls
+- that the database is using as many connections as expected (it polls
   PostgreSQL for the number of active connections while it runs)
-* the performance of the combined system under different loads
+- the performance of the combined system under different loads
 
 See the comments in the script for more information.
 
