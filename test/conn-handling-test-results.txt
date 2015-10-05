@@ -1,0 +1,243 @@
+$ test/load-test.sh; git stash apply; git diff < /dev/null; test/load-test.sh
+This is ApacheBench, Version 2.3 <$Revision: 1663405 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+1s: 1 connections
+2s: 4 connections
+3s: 4 connections
+4s: 4 connections
+5s: 3 connections
+6s: 4 connections
+7s: 5 connections
+8s: 5 connections
+9s: 6 connections
+10s:    5 connections
+Finished 2112 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            3000
+
+Document Path:          /api/v1/todos
+Document Length:        119 bytes
+
+Concurrency Level:      20
+Time taken for tests:   10.008 seconds
+Complete requests:      2112
+Failed requests:        0
+Total transferred:      650496 bytes
+HTML transferred:       251328 bytes
+Requests per second:    211.04 [#/sec] (mean)
+Time per request:       94.771 [ms] (mean)
+Time per request:       4.739 [ms] (mean, across all concurrent requests)
+Transfer rate:          63.48 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.2      0       3
+Processing:    59   94  16.6     90     183
+Waiting:       59   94  16.5     89     183
+Total:         61   94  16.6     90     184
+
+Percentage of the requests served within a certain time (ms)
+  50%     90
+  66%     96
+  75%    101
+  80%    104
+  90%    118
+  95%    130
+  98%    139
+  99%    145
+ 100%    184 (longest request)
+On branch master
+Your branch is ahead of 'origin/master' by 5 commits.
+  (use "git push" to publish your local commits)
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   server/routes/index.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+diff --git a/server/routes/index.js b/server/routes/index.js
+index 45d9a05..e6ca250 100644
+--- a/server/routes/index.js
++++ b/server/routes/index.js
+@@ -19,6 +19,12 @@ router.post('/api/v1/todos', function(req, res) {
+
+     // Get a Postgres client from the connection pool
+     pg.connect(connectionString, function(err, client, done) {
++        // Handle connection errors
++        if(err) {
++          done();
++          console.log(err);
++          return res.status(500).json({ success: false, data: err});
++        }
+
+         // SQL Query > Insert Data
+         client.query("INSERT INTO items(text, complete) values($1, $2)", [data.text, data.complete]);
+@@ -33,14 +39,10 @@ router.post('/api/v1/todos', function(req, res) {
+
+         // After all data is returned, close connection and return results
+         query.on('end', function() {
+-            client.end();
++            done();
+             return res.json(results);
+         });
+
+-        // Handle Errors
+-        if(err) {
+-          console.log(err);
+-        }
+
+     });
+ });
+@@ -51,6 +53,12 @@ router.get('/api/v1/todos', function(req, res) {
+
+     // Get a Postgres client from the connection pool
+     pg.connect(connectionString, function(err, client, done) {
++        // Handle connection errors
++        if(err) {
++          done();
++          console.log(err);
++          return res.status(500).json({ success: false, data: err});
++        }
+
+         // SQL Query > Select Data
+         var query = client.query("SELECT * FROM items ORDER BY id ASC;");
+@@ -62,15 +70,10 @@ router.get('/api/v1/todos', function(req, res) {
+
+         // After all data is returned, close connection and return results
+         query.on('end', function() {
+-            client.end();
++            done();
+             return res.json(results);
+         });
+
+-        // Handle Errors
+-        if(err) {
+-          console.log(err);
+-        }
+-
+     });
+
+ });
+@@ -87,6 +90,12 @@ router.put('/api/v1/todos/:todo_id', function(req, res) {
+
+     // Get a Postgres client from the connection pool
+     pg.connect(connectionString, function(err, client, done) {
++        // Handle connection errors
++        if(err) {
++          done();
++          console.log(err);
++          return res.status(500).send(json({ success: false, data: err}));
++        }
+
+         // SQL Query > Update Data
+         client.query("UPDATE items SET text=($1), complete=($2) WHERE id=($3)", [data.text, data.complete, id]);
+@@ -101,15 +110,9 @@ router.put('/api/v1/todos/:todo_id', function(req, res) {
+
+         // After all data is returned, close connection and return results
+         query.on('end', function() {
+-            client.end();
++            done();
+             return res.json(results);
+         });
+-
+-        // Handle Errors
+-        if(err) {
+-          console.log(err);
+-        }
+-
+     });
+
+ });
+@@ -124,6 +127,12 @@ router.delete('/api/v1/todos/:todo_id', function(req, res) {
+
+     // Get a Postgres client from the connection pool
+     pg.connect(connectionString, function(err, client, done) {
++        // Handle connection errors
++        if(err) {
++          done();
++          console.log(err);
++          return res.status(500).json({ success: false, data: err});
++        }
+
+         // SQL Query > Delete Data
+         client.query("DELETE FROM items WHERE id=($1)", [id]);
+@@ -138,15 +147,9 @@ router.delete('/api/v1/todos/:todo_id', function(req, res) {
+
+         // After all data is returned, close connection and return results
+         query.on('end', function() {
+-            client.end();
++            done();
+             return res.json(results);
+         });
+-
+-        // Handle Errors
+-        if(err) {
+-          console.log(err);
+-        }
+-
+     });
+
+ });
+This is ApacheBench, Version 2.3 <$Revision: 1663405 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking localhost (be patient)
+1s: 1 connections
+2s: 11 connections
+3s: 11 connections
+4s: 11 connections
+5s: 11 connections
+6s: 11 connections
+7s: 11 connections
+Completed 5000 requests
+8s: 11 connections
+9s: 11 connections
+10s:    11 connections
+Finished 8032 requests
+
+
+Server Software:
+Server Hostname:        localhost
+Server Port:            3000
+
+Document Path:          /api/v1/todos
+Document Length:        119 bytes
+
+Concurrency Level:      20
+Time taken for tests:   10.008 seconds
+Complete requests:      8032
+Failed requests:        0
+Total transferred:      2473856 bytes
+HTML transferred:       955808 bytes
+Requests per second:    802.55 [#/sec] (mean)
+Time per request:       24.921 [ms] (mean)
+Time per request:       1.246 [ms] (mean, across all concurrent requests)
+Transfer rate:          241.39 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    1   0.4      0      11
+Processing:    13   24   6.6     23     119
+Waiting:       13   24   6.6     22     118
+Total:         15   25   6.7     23     120
+ERROR: The median and mean for the initial connection time are more than twice the standard
+       deviation apart. These results are NOT reliable.
+
+Percentage of the requests served within a certain time (ms)
+  50%     23
+  66%     25
+  75%     27
+  80%     28
+  90%     31
+  95%     34
+  98%     41
+  99%     48
+ 100%    120 (longest request)
