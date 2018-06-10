@@ -146,7 +146,4 @@ router.delete('/api/v1/todos/:todo_id', (req, res, next) => {
   });*/
 });
 
-router.get('/api/v1/environment', (req, res, next) =>
-  res.json({ environment: process.env.TODO_ENV || "¯\_(ツ)_/¯"}));
-
 module.exports = router;
