@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "db-migrate": "node ./node_modules/.bin/db-migrate"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
