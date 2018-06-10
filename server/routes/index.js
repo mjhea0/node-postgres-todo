@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const pg = require('pg');
+const { Client } = require('pg');
+const connectionString = process.env.DATABASE_URL;
+const pg = new Client({ connectionString });
+pg.connect();
 const path = require('path');
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/todo';
+
 
 router.get('/', (req, res, next) => {
   res.sendFile(path.join(
@@ -12,12 +15,16 @@ router.get('/', (req, res, next) => {
 router.get('/api/v1/todos', (req, res, next) => {
   const results = [];
   // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
+
+  return pg.query('SELECT * FROM items ORDER BY id ASC;')
+    .then(({ rows }) => res.json(rows))
+    .catch(e => console.log(e) || res.status(500).json({success: false, data: e}));
+
+  /*pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
-    if(err) {
+    if (err) {
       done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
+
     }
     // SQL Query > Select Data
     const query = client.query('SELECT * FROM items ORDER BY id ASC;');
@@ -30,15 +37,21 @@ router.get('/api/v1/todos', (req, res, next) => {
       done();
       return res.json(results);
     });
-  });
+  });*/
 });
 
 router.post('/api/v1/todos', (req, res, next) => {
   const results = [];
   // Grab data from http request
   const data = {text: req.body.text, complete: false};
+
+  return pg.query('INSERT INTO items(text, complete) values($1, $2)', [data.text, data.complete])
+    .then(() => pg.query('SELECT * FROM items ORDER BY id ASC'))
+    .then(({ rows }) => res.json(rows))
+    .catch(e => console.log(e) || res.status(500).json({success: false, data: e}));
+
   // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
+  /*pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
     if(err) {
       done();
@@ -59,7 +72,7 @@ router.post('/api/v1/todos', (req, res, next) => {
       done();
       return res.json(results);
     });
-  });
+  });*/
 });
 
 router.put('/api/v1/todos/:todo_id', (req, res, next) => {
@@ -68,8 +81,14 @@ router.put('/api/v1/todos/:todo_id', (req, res, next) => {
   const id = req.params.todo_id;
   // Grab data from http request
   const data = {text: req.body.text, complete: req.body.complete};
+
+  return pg.query('UPDATE items SET text=($1), complete=($2) WHERE id=($3)', [data.text, data.complete, id])
+    .then(() => pg.query('SELECT * FROM items ORDER BY id ASC'))
+    .then(({ rows }) => res.json(rows))
+    .catch(e => console.log(e) || res.status(500).json({success: false, data: e}));
+
   // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
+  /*pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
     if(err) {
       done();
@@ -90,15 +109,21 @@ router.put('/api/v1/todos/:todo_id', (req, res, next) => {
       done();
       return res.json(results);
     });
-  });
+  });*/
 });
 
 router.delete('/api/v1/todos/:todo_id', (req, res, next) => {
   const results = [];
   // Grab data from the URL parameters
   const id = req.params.todo_id;
+
+  return pg.query('DELETE FROM items WHERE id=($1)', [id])
+    .then(() => pg.query('SELECT * FROM items ORDER BY id ASC'))
+    .then(({ rows }) => res.json(rows))
+    .catch(e => console.log(e) || res.status(500).json({success: false, data: e}));
+
   // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
+  /*pg.connect(connectionString, (err, client, done) => {
     // Handle connection errors
     if(err) {
       done();
@@ -118,7 +143,7 @@ router.delete('/api/v1/todos/:todo_id', (req, res, next) => {
       done();
       return res.json(results);
     });
-  });
+  });*/
 });
 
 module.exports = router;
