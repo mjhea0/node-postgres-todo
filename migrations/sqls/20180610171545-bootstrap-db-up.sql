@@ -1,0 +1,5 @@
+CREATE TABLE items(
+  id SERIAL PRIMARY KEY,
+  text VARCHAR NOT NULL,
+  complete BOOLEAN
+);
