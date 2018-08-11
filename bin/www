@@ -4,6 +4,9 @@
  * Module dependencies.
  */
 
+// get environment from .env file, if present
+require('dotenv').config();
+
 var app = require('../app');
 var debug = require('debug')('node-postgres-todo:server');
 var http = require('http');
